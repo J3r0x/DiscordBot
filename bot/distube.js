@@ -3,7 +3,6 @@ const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
 const { YouTubePlugin } = require('@distube/youtube');
 const ffmpegPath = require('ffmpeg-static');
-require('dotenv').config();
 
 const client = require('./client.js');
 

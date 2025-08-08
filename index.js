@@ -6,20 +6,44 @@ const { Events } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
+console.log('Loading Discord events...');
 // Cargar eventos de Discord
 fs.readdirSync('./events').forEach(file => {
     if (!file.endsWith('.js')) return;
     const event = require(`./events/${file}`);
     const eventName = file.split('.')[0];
-    client.on(Events[eventName.charAt(0).toUpperCase() + eventName.slice(1)], (...args) => event(...args, client));
+    console.log(`Loading Discord event: ${eventName}`);
+    
+    // Map event names to Discord.js Events
+    const eventMap = {
+        'ready': Events.ClientReady,
+        'messageCreate': Events.MessageCreate
+    };
+    
+    const discordEvent = eventMap[eventName];
+    if (discordEvent) {
+        client.on(discordEvent, (...args) => event(...args, client));
+    } else {
+        console.log(`Warning: Unknown event ${eventName}`);
+    }
 });
 
+console.log('Loading DisTube events...');
 // Cargar eventos de DisTube
 fs.readdirSync('./events/distube').forEach(file => {
     if (!file.endsWith('.js')) return;
     const event = require(`./events/distube/${file}`);
     const eventName = file.split('.')[0];
+    console.log(`Loading DisTube event: ${eventName}`);
     distube.on(eventName, event);
 });
 
-client.login(token);
+console.log('Logging in to Discord...');
+client.login(token)
+    .then(() => {
+        console.log('Discord login successful!');
+    })
+    .catch(error => {
+        console.error('Discord login failed:', error);
+        process.exit(1);
+    });
