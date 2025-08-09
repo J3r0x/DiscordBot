@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = (queue, song) => {
     const embed = new EmbedBuilder()
@@ -12,5 +12,17 @@ module.exports = (queue, song) => {
         .setTimestamp()
         .setThumbnail(song.thumbnail);
 
-    queue.textChannel.send({ embeds: [embed] });
+    const row = new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+                .setCustomId('skip')
+                .setLabel('⏭️ Skip')
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId('stop')
+                .setLabel('⏹️ Stop')
+                .setStyle(ButtonStyle.Danger)
+        );
+
+    queue.textChannel.send({ embeds: [embed], components: [row] });
 };

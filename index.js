@@ -17,7 +17,8 @@ fs.readdirSync('./events').forEach(file => {
     // Map event names to Discord.js Events
     const eventMap = {
         'ready': Events.ClientReady,
-        'messageCreate': Events.MessageCreate
+        'messageCreate': Events.MessageCreate,
+        'interactionCreate': Events.InteractionCreate
     };
     
     const discordEvent = eventMap[eventName];

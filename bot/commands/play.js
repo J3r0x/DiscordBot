@@ -6,19 +6,32 @@ module.exports = async function playCommand(message) {
 
     const args = message.content.split(' ').slice(1).join(' ');
     if (!args) return message.reply('You need to provide a song name or link to play.');
-    if (args.includes('playlist?list=')) {
-        const playlistId = args.split('playlist?list=')[1];
-        distube.play(voiceChannel, playlistId, {
-            member: message.member,
-            textChannel: message.channel,
-            message
-        });
-    } else if(args.includes('open.spotify.com/playlist') || args.includes('https://open.spotify.com/playlist')) {
-        const playlistId = args.split('playlist/')[1];
-        distube.play(voiceChannel, playlistId, {
-            member: message.member,
-            textChannel: message.channel,
-            message
-        });
+
+    try {
+        if (args.includes('playlist?list=')) {
+            const playlistId = args.split('playlist?list=')[1];
+            distube.play(voiceChannel, playlistId, {
+                member: message.member,
+                textChannel: message.channel,
+                message
+            });
+        } else if (args.includes('open.spotify.com/playlist') || args.includes('https://open.spotify.com/playlist')) {
+            const playlistId = args.split('playlist/')[1];
+            distube.play(voiceChannel, playlistId, {
+                member: message.member,
+                textChannel: message.channel,
+                message
+            });
+        } else {
+            // Handle individual songs (YouTube links, Spotify tracks, or search terms)
+            distube.play(voiceChannel, args, {
+                member: message.member,
+                textChannel: message.channel,
+                message
+            });
         }
+    } catch (error) {
+        console.error('Play command error:', error);
+        message.reply('An error occurred while trying to play the music.');
     }
+};
