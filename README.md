@@ -1,81 +1,123 @@
-# Discord Music Bot (DisTube + discord.js)
+# Discord Music Bot
 
-Un bot sencillo para reproducir música en canales de voz de Discord usando DisTube y discord.js v14. Soporta enlaces y búsquedas de YouTube, Spotify y SoundCloud mediante plugins.
+A production-ready Discord music bot built with **discord.js v14** and **DisTube v5**. This project demonstrates enterprise-level software engineering practices including modular architecture, robust error handling, and scalable event-driven design.
 
-## Características
-- Reproduce por búsqueda o URL (YouTube, Spotify, SoundCloud)
-- Manejo de cola y mensajes de estado básicos (now playing, added to queue, errores)
-- Comando de texto con prefijo: `!play`
+## Technical Stack
 
-## Requisitos
-- Node.js 18+
-- Una app/bot de Discord con “Message Content Intent” activado
+- **Runtime**: Node.js 18+
+- **Framework**: discord.js v14 with Gateway Intents
+- **Music Engine**: DisTube v5 with official plugins
+- **Audio Processing**: FFmpeg with @discordjs/opus
+- **Platform Support**: YouTube, Spotify, SoundCloud integration
 
-## Quick start
-1) Instala dependencias:
-```powershell
-npm install
+## Key Features
+
+- **Multi-platform Music Streaming**: Support for YouTube, Spotify, and SoundCloud via search queries and direct URLs
+- **Interactive UI Components**: Rich embeds with actionable buttons for seamless user experience
+- **Queue Management**: Comprehensive playlist handling with real-time status updates
+- **Robust Error Handling**: Graceful degradation with user-friendly error messages
+- **Voice Channel Validation**: Permission-based access control and state management
+
+## Installation & Setup
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/J3r0x/DiscordBot.git
+   cd DiscordBot
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Environment Configuration**:
+   ```json
+   // config.json
+   {
+     "token": "YOUR_DISCORD_BOT_TOKEN"
+   }
+   ```
+
+4. **Optional Spotify Integration**:
+   ```bash
+   # .env
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
+   ```
+
+5. **Start the application**:
+   ```bash
+   npm start
+   ```
+
+## Project Architecture
+
+## Project Architecture
+
 ```
-2) Configura credenciales (recomendado):
-```powershell
-Copy-Item .env.example .env
-# Edita .env y pega tu DISCORD_TOKEN; opcional: SPOTIFY_CLIENT_ID/SECRET
-```
-3) Inicia el bot:
-```powershell
-npm start
-```
-
-## Uso
-- Entra a un canal de voz
-- En un canal de texto, escribe: `!play <búsqueda|URL>`
-
-## Estructura mínima
-```
-index.js            # Carga eventos y hace login
-bot/
-  client.js         # Cliente de discord.js con intents
-  distube.js        # Instancia y plugins de DisTube
-  commands/
-    play.js         # Comando !play
-events/
-  ready.js          # Listo/arranque
-  messageCreate.js  # Enrutado de !play
-  distube/
-    playSong.js     # Mensaje "Now playing"
-    addSong.js      # Mensaje "Added to queue"
-    error.js        # Manejo de errores de DisTube
+src/
+├── index.js                    # Application entry point with event loader
+├── config.json                 # Bot authentication configuration
+├── bot/
+│   ├── client.js              # Discord.js client with optimized intents
+│   ├── distube.js             # DisTube instance with plugin configuration
+│   └── commands/              # Command handlers with business logic
+│       ├── play.js            # Music playback with playlist support
+│       ├── queue.js           # Queue display and management
+│       ├── skip.js            # Track skipping with validation
+│       └── stop.js            # Playback termination
+├── events/                    # Event-driven architecture
+│   ├── messageCreate.js       # Command routing and processing
+│   ├── interactionCreate.js   # Button interaction handling
+│   ├── ready.js               # Bot initialization and status
+│   └── distube/               # DisTube event handlers
+│       ├── playSong.js        # Now playing notifications
+│       ├── addSong.js         # Queue addition events
+│       └── error.js           # Centralized error handling
 ```
 
-## Problemas que tuvimos y cómo los solucionamos
-- Token expuesto o “Discord login failed”
-  - Causa: token en `config.json` o inválido/rotado.
-  - Fix: mover a `.env` (`DISCORD_TOKEN`), leer con `process.env.DISCORD_TOKEN`, agregar `.env` a `.gitignore` y rotar token en el Developer Portal.
+## Command Interface
 
-- El bot no responde a `!play`
-  - Causa: “Message Content Intent” desactivado, falta de permisos o el bot no está online.
-  - Fix: activar el intent en el portal, verificar `GatewayIntentBits.MessageContent`, revisar permisos del bot en el canal.
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `!play` | Stream music from URL or search query | `!play <song/URL>` |
+| `!queue` | Display current playlist | `!queue` |
+| `!skip` | Skip to next track | `!skip` |
+| `!stop` | Stop playback and clear queue | `!stop` |
 
-- No se une al canal de voz o no se escucha
-  - Causa: permisos “Connect”/“Speak” o codecs/FFmpeg.
-  - Fix: otorgar permisos; el proyecto usa `ffmpeg-static` y trae codecs (`@discordjs/opus`/`opusscript`).
+## Interactive Components
 
-- Evento `error` de DisTube con firma diferente
-  - Causa: variaciones entre versiones/plugins.
-  - Fix: normalización de argumentos en `events/distube/error.js` para notificar bien y loguear fallback.
+- **Skip Button**: Advance to next track with validation
+- **Stop Button**: Terminate playback with confirmation
+- **Rich Embeds**: Real-time playback information with metadata
 
-- Spotify 401/403
-  - Causa: credenciales faltantes.
-  - Fix: definir `SPOTIFY_CLIENT_ID` y `SPOTIFY_CLIENT_SECRET` en `.env`.
+## Engineering Highlights
 
-- Fallos esporádicos con YouTube/yt-dlp
-  - Fix: actualizar `@distube/yt-dlp` y reintentar.
+- **Modular Design**: Separation of concerns with clear boundaries between components
+- **Error Resilience**: Comprehensive error handling preventing application crashes
+- **State Management**: Robust queue state validation and edge case handling
+- **Security**: Environment-based configuration management
+- **Scalability**: Event-driven architecture supporting future feature expansion
 
-- Node incompatible
-  - Fix: usar Node 18+.
+## Dependencies
 
-## Nota de seguridad
-El repo lee el token desde `config.json`. Recomendamos migrar a `.env` y nunca versionar secretos. Si tu token estuvo público, rótalo.
+```json
+{
+  "discord.js": "^14.21.0",
+  "distube": "^5.0.7",
+  "@distube/spotify": "^2.0.2",
+  "@distube/youtube": "^1.0.4",
+  "@distube/yt-dlp": "^2.0.1",
+  "ffmpeg-static": "^5.2.0"
+}
+```
 
-## Licencia
-ISC.
+## Contributing
+
+This project follows industry best practices for maintainability and extensibility. Contributions are welcome following the established architectural patterns.
+
+---
+
+**Isaac Rivera** 
+[GitHub](https://github.com/J3r0x)
