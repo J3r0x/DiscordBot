@@ -3,6 +3,7 @@ const stopCommand = require('../bot/commands/stop');
 const skipCommand = require('../bot/commands/skip');
 const queueCommand = require('../bot/commands/queue');
 
+
 module.exports = async (message) => {
     if (message.author.bot) return;
 
